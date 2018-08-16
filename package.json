@@ -1,0 +1,45 @@
+{
+  "name": "arm-template-merge",
+  "version": "1.0.0",
+  "description": "Azure Resource Manager (ARM) Template Merge",
+  "keywords": [
+    "azure",
+    "arm",
+    "azure resource manager",
+    "template",
+    "merge",
+    "cli"
+  ],
+  "author": {
+    "name": "Jorge Poveda",
+    "email": "jorge.poveda@axa-assistance.es"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/axa-group/arm-template-merge.git"
+  },
+  "main": "index.js",
+  "files": [
+    "README.md",
+    "index.js"
+  ],
+  "scripts": {
+    "cleanup:testresults": "rimraf TestResults",
+    "eslint": "eslint --ignore-path .gitignore .",
+    "jest": "jest",
+    "pretest": "npm run cleanup:testresults && npm run eslint",
+    "test": "npm run jest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^5.3.0",
+    "eslint-plugin-jest": "^21.21.0",
+    "jest": "^23.5.0",
+    "jest-junit": "^5.1.0",
+    "rimraf": "^2.6.2"
+  }
+}
