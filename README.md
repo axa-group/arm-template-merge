@@ -24,6 +24,30 @@ npm install -g arm-template-merge
 
 Then run `arm-template-merge` without any arguments for details on its utilization.
 
+### Adding it as a dependency
+
+You may add it to your project as a dependency:
+
+```shell
+npm install arm-template-merge
+```
+
+And use the merge functionality from your code:
+
+```javascript
+const fs = require('fs');
+const mergeARMTemplates = require('arm-template-merge');
+
+let template1 = JSON.parse(fs.readFileSync('template1.json', 'utf8'));
+let template2 = JSON.parse(fs.readFileSync('template2.json', 'utf8'));
+
+let merged = {};
+merged = mergeARMTemplates(merged, template1);
+merged = mergeARMTemplates(merged, template2);
+
+fs.writeFileSync('merged-template.json', JSON.stringify(merged), 'utf8');
+```
+
 ## Rules
 
 The following rules are used for merging ARM template files:

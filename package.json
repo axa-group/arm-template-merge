@@ -25,7 +25,8 @@
   "main": "index.js",
   "files": [
     "README.md",
-    "index.js"
+    "index.js",
+    "lib/"
   ],
   "scripts": {
     "cleanup:testresults": "rimraf TestResults",
@@ -34,7 +35,9 @@
     "pretest": "npm run cleanup:testresults && npm run eslint",
     "test": "npm run jest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "fast-glob": "^2.2.2"
+  },
   "devDependencies": {
     "eslint": "^5.3.0",
     "eslint-plugin-jest": "^21.21.0",

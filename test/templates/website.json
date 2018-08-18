@@ -1,0 +1,123 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "metadata": { "description": "Application Name" },
+            "type": "string"
+        },
+        "environmentName": {
+            "metadata": { "description": "Environment name." },
+            "type": "string",
+            "allowedValues": [ "dev", "int", "uat", "prod" ]
+        }
+    },
+    "variables": {
+        "deploymentName": "[concat('example-', parameters('appName'), '-', parameters('environmentName'))]",
+        "servicePlanName": "[concat(variables('deploymentName'), '-serviceplan')]",
+        "apiSiteName": "[concat(variables('deploymentName'), '-api')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('apiSiteName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "kind": "api",
+            "properties": {
+                "serverFarmId": "[reference(variables('servicePlanName'), '2016-09-01').name]",
+                "enabled": true,
+                "clientAffinityEnabled": false,
+                "siteConfig": {
+                    "minTlsVersion": "1.2",
+                    "phpVersion": "off"
+                }
+            },
+            "resources": [
+                {
+                    "name": "appsettings",
+                    "type": "config",
+                    "apiVersion": "2016-08-01",
+                    "properties": {
+                    },
+                    "dependsOn": [
+                        "[variables('apiSiteName')]"
+                    ]
+                },
+                {
+                    "name": "staging",
+                    "type": "slots",
+                    "apiVersion": "2016-08-01",
+                    "location": "[resourceGroup().location]",
+                    "kind": "api",
+                    "properties": {
+                    },
+                    "resources": [
+                        {
+                            "name": "appsettings",
+                            "type": "config",
+                            "apiVersion": "2016-08-01",
+                            "properties": {
+                            },
+                            "dependsOn": [
+                                "staging"
+                            ]
+                        }
+                    ],
+                    "tags": {
+                        "application": "[parameters('appName')]",
+                        "environment": "[parameters('environmentName')]"
+                    },
+                    "dependsOn": [
+                        "[variables('apiSiteName')]"
+                    ]
+                }
+            ],
+            "tags": {
+                "application": "[parameters('appName')]",
+                "environment": "[parameters('environmentName')]"
+            }
+        },
+        {
+            "name": "[concat(variables('apiSiteName'), ' Server Errors')]",
+            "type": "microsoft.insights/alertrules",
+            "apiVersion": "2016-03-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[concat(variables('apiSiteName'), ' Server Errors')]",
+                "description": "[concat(variables('apiSiteName'), ' has some server errors, status code 5xx.')]",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('Microsoft.Web/sites', reference(variables('apiSiteName'), '2016-08-01').name)]",
+                        "metricName": "Http5xx"
+                    },
+                    "operator": "GreaterThan",
+                    "threshold": 0.0,
+                    "windowSize": "PT5M"
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "sendToServiceOwners": true,
+                    "customEmails": []
+                }
+            },
+            "tags": {
+                "application": "[parameters('appName')]",
+                "environment": "[parameters('environmentName')]"
+            }
+        }
+    ],
+    "outputs": {
+        "apiSiteName": {
+            "type": "string",
+            "value": "[variables('apiSiteName')]"
+        },
+        "apiSiteUri": {
+            "type": "string",
+            "value": "[concat('https://', reference(variables('apiSiteName')).hostnames[0])]"
+        }
+    }
+}

@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "metadata": { "description": "Application Name" },
+            "type": "string"
+        },
+        "environmentName": {
+            "metadata": { "description": "Environment name." },
+            "type": "string",
+            "allowedValues": [ "dev", "int", "uat", "prod" ]
+        },
+        "skuName": {
+            "metadata": { "description": "Plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/" },
+            "type": "string",
+            "allowedValues": [ "F1", "D1", "B1", "B2", "B3", "S1", "S2", "S3", "P1", "P2", "P3", "P1V2", "P2V2", "P3V2" ],
+            "defaultValue": "S1"
+        },
+        "skuCapacity": {
+            "metadata": { "description": "Describes plan's instance count" },
+            "type": "int",
+            "minValue": 1,
+            "defaultValue": 1
+        }
+    },
+    "variables": {
+        "deploymentName": "[concat('example-', parameters('appName'), '-', parameters('environmentName'))]",
+        "servicePlanName": "[concat(variables('deploymentName'), '-serviceplan')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('servicePlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2016-09-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[variables('servicePlanName')]",
+                "reserved": false
+            },
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "capacity": "[parameters('skuCapacity')]"
+            },
+            "tags": {
+                "application": "[parameters('appName')]",
+                "environment": "[parameters('environmentName')]"
+            }
+        }
+    ]
+}
