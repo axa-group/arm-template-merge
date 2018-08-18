@@ -23,9 +23,13 @@
     "url": "https://github.com/axa-group/arm-template-merge.git"
   },
   "main": "index.js",
+  "bin": {
+    "arm-template-merge": "./bin/arm-template-merge"
+  },
   "files": [
     "README.md",
     "index.js",
+    "bin/",
     "lib/"
   ],
   "scripts": {
