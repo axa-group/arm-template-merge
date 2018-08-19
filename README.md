@@ -63,7 +63,7 @@ The following rules are used for merging ARM template files:
 
 - All files' `functions` and `resources` collections will each be combined into a single collection. Objects within a collection that are exact copies will yield a single object in the merged collection:
 
-  ```json
+  ```text
   [                    |    [                    |    [
     { <object-A> },  --|-------------------------|-->   { <object-A> },
                        |      { <object-B> },  --|-->   { <object-B> },
@@ -73,7 +73,7 @@ The following rules are used for merging ARM template files:
 
 - All files' `parameters`, `variables` and `outputs` objects will each be combined into a single object. Files declaring the same key within an object MUST have the same exact value, or an error will be thrown:
 
-  ```json
+  ```text
   {                    |    {                    |    {
     "A": <value-A>,  --|-------------------------|-->   "A": <value-A>,
                        |      "B": <value-B>,  --|-->   "B": <value-B>,
