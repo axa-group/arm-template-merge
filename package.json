@@ -23,9 +23,14 @@
     "url": "https://github.com/axa-group/arm-template-merge.git"
   },
   "main": "index.js",
+  "bin": {
+    "arm-template-merge": "./bin/arm-template-merge"
+  },
   "files": [
     "README.md",
-    "index.js"
+    "index.js",
+    "bin/",
+    "lib/"
   ],
   "scripts": {
     "cleanup:testresults": "rimraf TestResults",
@@ -34,7 +39,9 @@
     "pretest": "npm run cleanup:testresults && npm run eslint",
     "test": "npm run jest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "fast-glob": "^2.2.2"
+  },
   "devDependencies": {
     "eslint": "^5.3.0",
     "eslint-plugin-jest": "^21.21.0",

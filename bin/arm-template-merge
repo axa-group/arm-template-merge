@@ -1,0 +1,145 @@
+#!/usr/bin/env node
+
+/**
+* Copyright (c) AXA Partners
+*
+* Licensed under the AXA Partners License (the "License"); you
+* may not use this file except in compliance with the License.
+* A copy of the License can be found in the LICENSE.md file distributed
+* together with this file.
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
+const fg = require('fast-glob');
+const mergeARMTemplates = require('../');
+
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
+
+/* eslint no-console: off */
+
+cli(process.argv.slice(2));
+
+async function cli(args) {
+  let opts = parseArgs(args);
+
+  if (!opts) {
+    showHelp();
+    process.exitCode = 0;
+    return;
+  }
+
+  try {
+    await mergeTemplates(opts.inGlobs, opts.outFile);
+    process.exitCode = 0;
+  } catch (err) {
+    console.error('Error: ' + err.message);
+    process.exitCode = 1;
+  }
+}
+
+function parseArgs(args) {
+  if (args.length < 2) {
+    return null;
+  }
+
+  let opts = {
+    inGlobs: args.slice(0, args.length - 1),
+    outFile: args[args.length - 1]
+  };
+
+  return opts;
+}
+
+function showHelp() {
+  let scriptName = path.basename(__filename, '.js');
+  console.log(`Usage: ${scriptName} <input-template-pattern>... <output-template>
+       ${scriptName} templates/**/*.json merged-template.json
+
+This tool merges multiple Azure Resource Manager (ARM) template files
+into a single template file.
+
+The following rules are used for merging ARM template files:
+
+  - All files MUST share the same exact values for the following fields:
+
+    - "$schema"
+    - "contentVersion"
+    - "apiProfile" (if present)
+
+  - All files' "functions" and "resources" collections will each be
+    combined into a single collection. Objects within a collection that are
+    exact copies will yield a single object in the merged collection:
+
+    [                    |    [                    |    [
+      { <object-A> },  --|-------------------------|-->   { <object-A> },
+                         |      { <object-B> },  --|-->   { <object-B> },
+      { <object-C> },    |      { <object-C> },    |      { <object-C> }
+    ]                    |    ]                    |    ]
+
+  - All files' "parameters", "variables" and "outputs" objects will each
+    be combined into a single object. Files declaring the same key within
+    an object MUST have the same exact value, or an error will be thrown:
+
+    {                    |    {                    |    {
+      "A": <value-A>,  --|-------------------------|-->   "A": <value-A>,
+                         |      "B": <value-B>,  --|-->   "B": <value-B>,
+      "C": <value-C>,    |      "C": <value-C>,    |      "C": <value-C>
+      "D": <value-D1>    |      "D": <value-D2>    |      <<< ERROR >>>
+    }                    |    }                    |    }
+
+  - Value and object equality follows Node.js' "assert.deepStrictEqual()"
+    rules.`);
+}
+
+async function mergeTemplates(inGlobs, outFile) {
+  let inFiles = await fg(inGlobs);
+
+  if (inFiles.length == 0) {
+    throw new Error('No template files could be found.');
+  }
+
+  let mergedTemplate = {};
+
+  for (let inFile of inFiles) {
+    await mergeTemplateWith(mergedTemplate, inFile);
+  }
+
+  await saveTemplate(mergedTemplate, outFile);
+}
+
+async function mergeTemplateWith(target, inFile) {
+  let source = await loadTemplate(inFile);
+  console.log(`Merging ARM template '${inFile}'...`);
+
+  mergeARMTemplates(target, source);
+}
+
+async function loadTemplate(inFile) {
+  let json = await readFile(inFile, 'utf8');
+  let template = JSON.parse(json);
+
+  for (let key of ['$schema', 'contentVersion']) {
+    if (!template[key] || typeof template[key] !== 'string') {
+      throw new Error(`Template '${inFile}' does not have a valid "${key}" value.`);
+    }
+  }
+
+  return template;
+}
+
+async function saveTemplate(template, outFile) {
+  let json = JSON.stringify(template, null, 4);
+  await writeFile(outFile, json, 'utf8');
+  console.log(`Saved merged ARM template '${outFile}'.`);
+}

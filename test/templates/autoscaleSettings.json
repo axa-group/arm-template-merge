@@ -1,0 +1,82 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "metadata": { "description": "Application Name" },
+            "type": "string"
+        },
+        "environmentName": {
+            "metadata": { "description": "Environment name." },
+            "type": "string",
+            "allowedValues": [ "dev", "int", "uat", "prod" ]
+        }
+    },
+    "variables": {
+        "deploymentName": "[concat('example-', parameters('appName'), '-', parameters('environmentName'))]",
+        "servicePlanName": "[concat(variables('deploymentName'), '-serviceplan')]"
+    },
+    "resources": [
+        {
+            "name": "[concat(variables('servicePlanName'), ' Autoscale Settings')]",
+            "type": "Microsoft.Insights/autoscalesettings",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "targetResourceUri": "[resourceId('Microsoft.Web/serverfarms', reference(variables('servicePlanName'), '2016-09-01').name)]",
+                "profiles": [
+                    {
+                        "name": "Default",
+                        "capacity": {
+                            "minimum": 2,
+                            "maximum": 3,
+                            "default": 2
+                        },
+                        "rules": [
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CpuPercentage",
+                                    "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', reference(variables('servicePlanName'), '2016-09-01').name)]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT10M",
+                                    "timeAggregation": "Average",
+                                    "operator": "GreaterThan",
+                                    "threshold": 80.0
+                                },
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": 1,
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CpuPercentage",
+                                    "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', reference(variables('servicePlanName'), '2016-09-01').name)]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT1H",
+                                    "timeAggregation": "Average",
+                                    "operator": "LessThan",
+                                    "threshold": 60.0
+                                },
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": 1,
+                                    "cooldown": "PT1H"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "tags": {
+                "application": "[parameters('appName')]",
+                "environment": "[parameters('environmentName')]"
+            }
+        }
+    ]
+}
