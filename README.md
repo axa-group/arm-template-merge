@@ -1,5 +1,8 @@
 # `arm-template-merge`
 
+[![npm package](https://img.shields.io/npm/v/arm-template-merge.svg?logo=npm)](https://www.npmjs.com/package/arm-template-merge)
+[![Node.js version](https://img.shields.io/node/v/arm-template-merge.svg)](https://nodejs.org/)
+
 > _Azure Resource Manager (ARM) Template Merge_
 
 This tool merges multiple [Azure Resource Manager (ARM) template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authoring-templates) files into a single template file.
