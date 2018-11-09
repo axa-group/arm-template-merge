@@ -26,6 +26,8 @@ const mergeARMTemplates = require('../');
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
+const utf8BOM = Buffer.from([0xEF, 0xBB, 0xBF]);
+
 /* eslint no-console: off */
 
 cli(process.argv.slice(2));
@@ -126,7 +128,14 @@ async function mergeTemplateWith(target, inFile) {
 }
 
 async function loadTemplate(inFile) {
-  let json = await readFile(inFile, 'utf8');
+  let jsonBuf = await readFile(inFile);
+
+  // Strip the UTF-8 BOM, if present
+  if (jsonBuf.slice(0, 3).equals(utf8BOM)) {
+    jsonBuf = jsonBuf.slice(3);
+  }
+
+  let json = jsonBuf.toString('utf8');
   let template = JSON.parse(json);
 
   for (let key of ['$schema', 'contentVersion']) {
