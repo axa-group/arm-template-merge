@@ -27,6 +27,7 @@
     "arm-template-merge": "./bin/arm-template-merge"
   },
   "files": [
+    "CHANGELOG.md",
     "README.md",
     "index.js",
     "bin/",
@@ -40,13 +41,13 @@
     "test": "npm run jest"
   },
   "dependencies": {
-    "fast-glob": "^2.2.2"
+    "fast-glob": "^2.2.3"
   },
   "devDependencies": {
-    "eslint": "^5.3.0",
-    "eslint-plugin-jest": "^21.21.0",
-    "jest": "^23.5.0",
-    "jest-junit": "^5.1.0",
+    "eslint": "^5.8.0",
+    "eslint-plugin-jest": "^22.0.0",
+    "jest": "^23.6.0",
+    "jest-junit": "^5.2.0",
     "rimraf": "^2.6.2"
   }
 }
