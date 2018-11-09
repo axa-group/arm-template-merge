@@ -27,6 +27,7 @@
     "arm-template-merge": "./bin/arm-template-merge"
   },
   "files": [
+    "CHANGELOG.md",
     "README.md",
     "index.js",
     "bin/",
