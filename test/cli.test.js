@@ -88,6 +88,42 @@ describe('CLI', () => {
     expect(() => JSON.parse(data)).not.toThrow();
   });
 
+  it('should be able to read template files with a UTF-8 BOM', async () => {
+    const utf8BOM = Buffer.from([0xEF, 0xBB, 0xBF]);
+
+    let files = [
+      'templates/alertRules.json',
+      'templates/autoscaleSettings.json',
+      'templates/servicePlan.json',
+      'templates/website.json'
+    ];
+
+    let mockFiles = new Map();
+
+    for (let file of files) {
+      let buf = Buffer.concat([utf8BOM, await readFile(file)]);
+      mockFiles.set(file, buf);
+    }
+
+    let rfn = mockFileRead(mockFiles);
+    let wfn = mockWriteFile();
+
+    let res = await executeCli('templates/*.json', 'merged-template.json');
+
+    rfn.mockRestore();
+
+    expect(res.exitCode).toBe(0);
+    expect(res.stderr).toBe('');
+
+    expect(wfn).toHaveBeenCalledTimes(1);
+    let [ outFilename, data ] = wfn.mock.calls[0];
+
+    wfn.mockRestore();
+
+    expect(outFilename).toBe('merged-template.json');
+    expect(() => JSON.parse(data)).not.toThrow();
+  });
+
   it.each([
     [ '$schema', null ],
     [ '$schema', 0 ],
@@ -116,6 +152,10 @@ function mockFileRead(fileMap) {
 
     if (!body) {
       return originalReadFile(...args);
+    }
+
+    if (typeof body === 'string') {
+      body = Buffer.from(body, 'utf8');
     }
 
     let cb = args[args.length - 1];
