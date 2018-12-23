@@ -1,21 +1,19 @@
 #!/usr/bin/env node
 
 /**
-* Copyright (c) AXA Partners
-*
-* Licensed under the AXA Partners License (the "License"); you
-* may not use this file except in compliance with the License.
-* A copy of the License can be found in the LICENSE.md file distributed
-* together with this file.
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-**/
-
-'use strict';
+ * Copyright (c) AXA Partners
+ *
+ * Licensed under the AXA Partners License (the "License"); you
+ * may not use this file except in compliance with the License.
+ * A copy of the License can be found in the LICENSE.md file distributed
+ * together with this file.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 const fs = require('fs');
 const path = require('path');
@@ -33,7 +31,7 @@ const utf8BOM = Buffer.from([0xEF, 0xBB, 0xBF]);
 cli(process.argv.slice(2));
 
 async function cli(args) {
-  let opts = parseArgs(args);
+  const opts = parseArgs(args);
 
   if (!opts) {
     showHelp();
@@ -45,7 +43,7 @@ async function cli(args) {
     await mergeTemplates(opts.inGlobs, opts.outFile);
     process.exitCode = 0;
   } catch (err) {
-    console.error('Error: ' + err.message);
+    console.error(`Error: ${err.message}`);
     process.exitCode = 1;
   }
 }
@@ -55,16 +53,16 @@ function parseArgs(args) {
     return null;
   }
 
-  let opts = {
+  const opts = {
     inGlobs: args.slice(0, args.length - 1),
-    outFile: args[args.length - 1]
+    outFile: args[args.length - 1],
   };
 
   return opts;
 }
 
 function showHelp() {
-  let scriptName = path.basename(__filename, '.js');
+  const scriptName = path.basename(__filename, '.js');
   console.log(`Usage: ${scriptName} <input-template-pattern>... <output-template>
        ${scriptName} templates/**/*.json merged-template.json
 
@@ -105,23 +103,23 @@ The following rules are used for merging ARM template files:
 }
 
 async function mergeTemplates(inGlobs, outFile) {
-  let inFiles = await fg(inGlobs);
+  const inFiles = await fg(inGlobs);
 
-  if (inFiles.length == 0) {
+  if (inFiles.length === 0) {
     throw new Error('No template files could be found.');
   }
 
-  let mergedTemplate = {};
+  const mergedTemplate = {};
 
-  for (let inFile of inFiles) {
-    await mergeTemplateWith(mergedTemplate, inFile);
-  }
+  const mergeOps = inFiles.map(inFile => mergeTemplateWith(mergedTemplate, inFile));
+
+  await Promise.all(mergeOps);
 
   await saveTemplate(mergedTemplate, outFile);
 }
 
 async function mergeTemplateWith(target, inFile) {
-  let source = await loadTemplate(inFile);
+  const source = await loadTemplate(inFile);
   console.log(`Merging ARM template '${inFile}'...`);
 
   mergeARMTemplates(target, source);
@@ -135,20 +133,22 @@ async function loadTemplate(inFile) {
     jsonBuf = jsonBuf.slice(3);
   }
 
-  let json = jsonBuf.toString('utf8');
-  let template = JSON.parse(json);
+  const json = jsonBuf.toString('utf8');
+  const template = JSON.parse(json);
 
-  for (let key of ['$schema', 'contentVersion']) {
+  const expectedKeys = ['$schema', 'contentVersion'];
+
+  expectedKeys.forEach((key) => {
     if (!template[key] || typeof template[key] !== 'string') {
       throw new Error(`Template '${inFile}' does not have a valid "${key}" value.`);
     }
-  }
+  });
 
   return template;
 }
 
 async function saveTemplate(template, outFile) {
-  let json = JSON.stringify(template, null, 4);
+  const json = JSON.stringify(template, null, 4);
   await writeFile(outFile, json, 'utf8');
   console.log(`Saved merged ARM template '${outFile}'.`);
 }

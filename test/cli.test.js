@@ -1,5 +1,3 @@
-'use strict';
-
 const util = require('util');
 const fs = require('fs');
 const cs = require('./lib/child-script');
@@ -23,7 +21,7 @@ describe('CLI', () => {
   });
 
   it('should be able to print out usage information', async () => {
-    let res = await executeCli();
+    const res = await executeCli();
 
     expect(res.exitCode).toBe(0);
     expect(res.stdout).toMatch(/^Usage: arm-template-merge <input-template-pattern>... <output-template>/);
@@ -31,7 +29,7 @@ describe('CLI', () => {
   });
 
   it('should print out usage information if less than 2 arguments are provided', async () => {
-    let res = await executeCli('merged-template.json');
+    const res = await executeCli('merged-template.json');
 
     expect(res.exitCode).toBe(0);
     expect(res.stdout).toMatch(/^Usage: arm-template-merge <input-template-pattern>... <output-template>/);
@@ -39,7 +37,7 @@ describe('CLI', () => {
   });
 
   it('should show an error message if no input files were found', async () => {
-    let res = await executeCli('./**/a-template-that-does-not-exist.json', 'merged-template.json');
+    const res = await executeCli('./**/a-template-that-does-not-exist.json', 'merged-template.json');
 
     expect(res.exitCode).toBe(1);
     expect(res.stderr).toMatch(/^Error: No template files could be found\./);
@@ -47,11 +45,11 @@ describe('CLI', () => {
   });
 
   it('should show an error message if an input file is not a JSON file', async () => {
-    let rfn = mockFileRead(new Map([
-      [ 'templates/website.json', 'This is NOT JSON!' ]
+    const rfn = mockFileRead(new Map([
+      ['templates/website.json', 'This is NOT JSON!'],
     ]));
 
-    let res = await executeCli('templates/*.json', 'merged-template.json');
+    const res = await executeCli('templates/*.json', 'merged-template.json');
 
     rfn.mockRestore();
 
@@ -59,28 +57,28 @@ describe('CLI', () => {
     expect(res.stderr).toMatch(/^Error:/);
   });
 
-  it('should be able to merge template files into a new file', async() => {
-    let wfn = mockWriteFile();
+  it('should be able to merge template files into a new file', async () => {
+    const wfn = mockWriteFile();
 
-    let res = await executeCli('templates/*.json', 'merged-template.json');
+    const res = await executeCli('templates/*.json', 'merged-template.json');
 
     expect(res.exitCode).toBe(0);
     expect(res.stderr).toBe('');
 
-    let inFiles = getInFiles(res.stdout);
-    let outFile = getOutFile(res.stdout);
+    const inFiles = getInFiles(res.stdout);
+    const outFile = getOutFile(res.stdout);
 
     expect(inFiles.sort()).toMatchObject([
       'templates/alertRules.json',
       'templates/autoscaleSettings.json',
       'templates/servicePlan.json',
-      'templates/website.json'
+      'templates/website.json',
     ]);
 
     expect(outFile).toBe('merged-template.json');
 
     expect(wfn).toHaveBeenCalledTimes(1);
-    let [ outFilename, data ] = wfn.mock.calls[0];
+    const [outFilename, data] = wfn.mock.calls[0];
 
     wfn.mockRestore();
 
@@ -91,24 +89,26 @@ describe('CLI', () => {
   it('should be able to read template files with a UTF-8 BOM', async () => {
     const utf8BOM = Buffer.from([0xEF, 0xBB, 0xBF]);
 
-    let files = [
+    const files = [
       'templates/alertRules.json',
       'templates/autoscaleSettings.json',
       'templates/servicePlan.json',
-      'templates/website.json'
+      'templates/website.json',
     ];
 
-    let mockFiles = new Map();
+    const bufs = await Promise.all(files.map(file => readFile(file)));
 
-    for (let file of files) {
-      let buf = Buffer.concat([utf8BOM, await readFile(file)]);
-      mockFiles.set(file, buf);
+    const mockFiles = new Map();
+
+    for (let i = 0; i < files.length; i += 1) {
+      const buf = Buffer.concat([utf8BOM, bufs[i]]);
+      mockFiles.set(files[i], buf);
     }
 
-    let rfn = mockFileRead(mockFiles);
-    let wfn = mockWriteFile();
+    const rfn = mockFileRead(mockFiles);
+    const wfn = mockWriteFile();
 
-    let res = await executeCli('templates/*.json', 'merged-template.json');
+    const res = await executeCli('templates/*.json', 'merged-template.json');
 
     rfn.mockRestore();
 
@@ -116,7 +116,7 @@ describe('CLI', () => {
     expect(res.stderr).toBe('');
 
     expect(wfn).toHaveBeenCalledTimes(1);
-    let [ outFilename, data ] = wfn.mock.calls[0];
+    const [outFilename, data] = wfn.mock.calls[0];
 
     wfn.mockRestore();
 
@@ -125,19 +125,19 @@ describe('CLI', () => {
   });
 
   it.each([
-    [ '$schema', null ],
-    [ '$schema', 0 ],
-    [ 'contentVersion', null ],
-    [ 'contentVersion', 0 ]
+    ['$schema', null],
+    ['$schema', 0],
+    ['contentVersion', null],
+    ['contentVersion', 0],
   ])('should show an error message if a template has an invalid value for field "%s" (%o)', async (fld, value) => {
-    let template = JSON.parse(await readFile('templates/website.json'));
+    const template = JSON.parse(await readFile('templates/website.json'));
     template[fld] = value;
 
-    let rfn = mockFileRead(new Map([
-      [ 'templates/website.json', JSON.stringify(template) ]
+    const rfn = mockFileRead(new Map([
+      ['templates/website.json', JSON.stringify(template)],
     ]));
 
-    let res = await executeCli('templates/*.json', 'merged-template.json');
+    const res = await executeCli('templates/*.json', 'merged-template.json');
 
     rfn.mockRestore();
 
@@ -158,7 +158,7 @@ function mockFileRead(fileMap) {
       body = Buffer.from(body, 'utf8');
     }
 
-    let cb = args[args.length - 1];
+    const cb = args[args.length - 1];
 
     return cb(null, body);
   });
@@ -169,29 +169,30 @@ function mockWriteFile() {
 }
 
 function getInFiles(stdout) {
-  let rx = /^Merging ARM template '(.*)'\.\.\.$/gm;
+  const rx = /^Merging ARM template '(.*)'\.\.\.$/gm;
 
-  let res = [];
+  const res = [];
 
-  let m;
-  while ((m = rx.exec(stdout)) != null) {
+  let m = rx.exec(stdout);
+  while (m != null) {
     res.push(m[1]);
+    m = rx.exec(stdout);
   }
 
   return res;
 }
 
 function getOutFile(stdout) {
-  let rx = /^Saved merged ARM template '(.*)'\.$/m;
+  const rx = /^Saved merged ARM template '(.*)'\.$/m;
 
-  let m = rx.exec(stdout);
-  
+  const m = rx.exec(stdout);
+
   return m ? m[1] : null;
 }
 
 async function executeCli(...args) {
-  let res = cs.mockExec(cliPath, ...args);
-  let done = await waitFor(() => typeof res.exitCode !== 'undefined' || res.err, 200, 2000);
+  const res = cs.mockExec(cliPath, ...args);
+  const done = await waitFor(() => typeof res.exitCode !== 'undefined' || res.err, 200, 2000);
   res.mockRestore();
 
   if (!done) {
@@ -204,20 +205,20 @@ async function executeCli(...args) {
 }
 
 async function waitFor(conditionFn, watchInterval, timeout) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (conditionFn()) {
       resolve(true);
       return;
     }
 
-    let watchTimer = setInterval(() => {
+    const watchTimer = setInterval(() => {
       if (conditionFn()) {
         clearTimers();
         resolve(true);
       }
     }, watchInterval);
-    
-    let timeoutTimer = setTimeout(() => {
+
+    const timeoutTimer = setTimeout(() => {
       clearTimers();
       resolve(false);
     }, timeout);
