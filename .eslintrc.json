@@ -9,6 +9,7 @@
     "ecmaVersion": 2017
   },
   "rules": {
+    "no-param-reassign": "off",
     "linebreak-style": "off",
     "no-use-before-define": ["error", { "functions": false }],
     "valid-jsdoc": "warn"
