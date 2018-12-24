@@ -1,18 +1,16 @@
-'use strict';
-
 const util = require('util');
 
 /* eslint no-console: off */
 
 function mockExec(scriptPath, ...args) {
-  let argv = process.argv;
-  process.argv = [ argv[0], scriptPath, ...args ];
+  const argv = process.argv; /* eslint-disable-line prefer-destructuring */
+  process.argv = [argv[0], scriptPath, ...args];
 
-  let log = new ConsoleOutHook('log');
-  let error = new ConsoleOutHook('error');
-  let exitCode = new ExitCodeHook();
+  const log = new ConsoleOutHook('log');
+  const error = new ConsoleOutHook('error');
+  const exitCode = new ExitCodeHook();
 
-  let res = {
+  const res = {
     get stdout() { return log.output; },
     get stderr() { return error.output; },
     get exitCode() { return exitCode.value; },
@@ -22,11 +20,11 @@ function mockExec(scriptPath, ...args) {
       log.mockRestore();
       error.mockRestore();
       exitCode.mockRestore();
-    }
+    },
   };
 
   try {
-    require(scriptPath);
+    require(scriptPath); /* eslint-disable-line global-require, import/no-dynamic-require */
   } catch (err) {
     res.err = err;
   }
@@ -37,35 +35,35 @@ function mockExec(scriptPath, ...args) {
 function ConsoleOutHook(method) {
   this.output = '';
 
-  let old = console[method];
+  const old = console[method];
   console[method] = (format, ...param) => {
-    this.output += util.format(format, ...param) + '\n';
+    this.output += util.format(`${format}\n`, ...param);
   };
 
-  this.mockClear = function() {
+  this.mockClear = function mockClear() {
     this.output = '';
   };
 
-  this.mockRestore = function() {
+  this.mockRestore = function mockRestore() {
     console[method] = old;
   };
 }
 
 function ExitCodeHook() {
   this.value = undefined;
-  
+
   Object.defineProperty(process, 'exitCode', {
     get: () => undefined,
-    set: (v) => this.value = v,
+    set: (v) => { this.value = v; },
     configurable: true,
-    enumerable: true
+    enumerable: true,
   });
-  
-  this.mockRestore = function() {
+
+  this.mockRestore = function mockRestore() {
     delete process.exitCode;
   };
 }
 
 module.exports = {
-  mockExec
+  mockExec,
 };
