@@ -64,7 +64,7 @@ describe('Merge', () => {
 
     const merge = () => mergeARMTemplates(template1, template2);
 
-    expect(merge).toThrow('Property "parameters"."appName" cannot be merged. Source and target values are different.');
+    expect(merge).toThrow('Property "parameters.appName" cannot be merged. Source and target values are different.');
   });
 });
 
