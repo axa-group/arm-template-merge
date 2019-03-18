@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Add changelog
 - Add stripping of UTF-8 BOM on input files
 
+### Changed
+
+- Reduce merge code complexity
+
 ### Security
 
 - Update `npm` dependencies to fix [CVE-2018-16469](https://nvd.nist.gov/vuln/detail/CVE-2018-16469)
