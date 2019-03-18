@@ -27,6 +27,12 @@ npm install -g arm-template-merge
 
 Then run `arm-template-merge` without any arguments for details on its utilization.
 
+Alternatively, you can execute the CLI without installing it by running:
+
+```shell
+npx arm-template-merge
+```
+
 ### Adding it as a dependency
 
 You may add it to your project as a dependency:
