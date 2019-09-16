@@ -22,7 +22,7 @@ describe('Merge', () => {
       'autoscaleSettings.json',
       'servicePlan.json',
       'website.json',
-    ].map(filename => readTestTemplate(filename)));
+    ].map((filename) => readTestTemplate(filename)));
 
     sources.forEach((source) => {
       target = mergeARMTemplates(target, source);

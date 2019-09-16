@@ -111,7 +111,7 @@ async function mergeTemplates(inGlobs, outFile) {
 
   const mergedTemplate = {};
 
-  const mergeOps = inFiles.map(inFile => mergeTemplateWith(mergedTemplate, inFile));
+  const mergeOps = inFiles.map((inFile) => mergeTemplateWith(mergedTemplate, inFile));
 
   await Promise.all(mergeOps);
 
