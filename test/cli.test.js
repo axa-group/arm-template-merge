@@ -96,7 +96,7 @@ describe('CLI', () => {
       'templates/website.json',
     ];
 
-    const bufs = await Promise.all(files.map(file => readFile(file)));
+    const bufs = await Promise.all(files.map((file) => readFile(file)));
 
     const mockFiles = new Map();
 
