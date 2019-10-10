@@ -54,7 +54,7 @@ describe('CLI', () => {
     rfn.mockRestore();
 
     expect(res.exitCode).toBe(1);
-    expect(res.stderr).toMatch(/^Error:/);
+    expect(res.stderr).toMatch(/^Error: Template 'templates\/website.json' could not be parsed:/);
   });
 
   it('should be able to merge template files into a new file', async () => {

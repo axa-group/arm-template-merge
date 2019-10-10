@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Update `npm` dependencies to fix:
   - [WS-2019-0291](https://github.com/wycats/handlebars.js/issues/1558)
 
+### Added
+
+- Improve error message on template parsing failures
+
 ## [1.1.3](https://github.com/axa-group/arm-template-merge/compare/v1.1.2...v1.1.3) — 2019-09-25
 
 ### Security
