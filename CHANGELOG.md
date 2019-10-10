@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/axa-group/arm-template-merge/compare/v1.1.3...HEAD)
+## [1.1.4](https://github.com/axa-group/arm-template-merge/compare/v1.1.3...v1.1.4) — 2019-10-10
 
 ### Security
 
