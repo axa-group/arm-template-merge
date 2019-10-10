@@ -134,7 +134,13 @@ async function loadTemplate(inFile) {
   }
 
   const json = jsonBuf.toString('utf8');
-  const template = JSON.parse(json);
+
+  let template;
+  try {
+    template = JSON.parse(json);
+  } catch (err) {
+    throw new Error(`Template '${inFile}' could not be parsed: ${err.message}`);
+  }
 
   const expectedKeys = ['$schema', 'contentVersion'];
 

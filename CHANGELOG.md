@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [1.1.4](https://github.com/axa-group/arm-template-merge/compare/v1.1.3...v1.1.4) — 2019-10-10
+
+### Security
+
+- Update `npm` dependencies to fix:
+  - [WS-2019-0291](https://github.com/wycats/handlebars.js/issues/1558)
+
+### Added
+
+- Improve error message on template parsing failures
+
 ## [1.1.3](https://github.com/axa-group/arm-template-merge/compare/v1.1.2...v1.1.3) — 2019-09-25
 
 ### Security
