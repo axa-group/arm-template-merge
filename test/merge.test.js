@@ -1,7 +1,7 @@
 const path = require('path');
 const util = require('util');
 const fs = require('fs');
-const mergeARMTemplates = require('../');
+const mergeARMTemplates = require('..');
 
 const readFile = util.promisify(fs.readFile);
 
