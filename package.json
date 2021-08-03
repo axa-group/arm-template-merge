@@ -41,15 +41,15 @@
     "test": "npm run jest"
   },
   "dependencies": {
-    "fast-glob": "^3.2.2"
+    "fast-glob": "^3.2.7"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-jest": "^23.8.2",
-    "jest": "^24.9.0",
-    "jest-junit": "^10.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jest": "^24.4.0",
+    "jest": "^27.0.6",
+    "jest-junit": "^12.2.0",
     "rimraf": "^3.0.2"
   }
 }
