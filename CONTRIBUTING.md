@@ -20,6 +20,10 @@ Generally we like to see pull requests that
 - Have tests
 - Don't decrease the current code coverage (see `TestResults/coverage/index.html`)
 
+## Development Prerequisites
+
+- [Node.js 10.0+](https://nodejs.org/)
+
 ## Running tests
 
 To run tests locally, first install all dependencies.
