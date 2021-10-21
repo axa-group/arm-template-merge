@@ -15,7 +15,7 @@ Although [linked templates](https://docs.microsoft.com/en-us/azure/azure-resourc
 
 ## Prerequisites
 
-- [Node.js 8.0+](https://nodejs.org/)
+- [Node.js 12.0+](https://nodejs.org/)
 
 ## How to use
 
